@@ -51,7 +51,7 @@ public final class RecipeMatcher {
      * Decides whether one recipe can be cooked with the current pantry.
      * Returns true only if EVERY ingredient is in the pantry in at least the
      * required quantity, and false as soon as one is missing or too small.
-     * One missing ingredient rejects the whole recipe, because the app only
+     n* One missing ingredient rejects the whole recipe, because the app only
      * suggests meals the user can make right now without shopping.
      * Quantities are converted to base units (g, ml, piece) first, so that
      * 1 kg of rice correctly satisfies a recipe that needs 200 g.

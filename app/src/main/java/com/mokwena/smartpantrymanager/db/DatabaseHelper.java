@@ -1,4 +1,6 @@
-package com.mokwena.smartpantrymanager.db;
+
+Databasehelper · JAVA
+        package com.mokwena.smartpantrymanager.db;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -31,12 +33,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
+    /** Runs every time the database opens: switches on foreign-key checking. */
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
         db.setForeignKeyConstraintsEnabled(true);
     }
 
+    /** Runs once, when the database file is first created: builds the tables and loads the recipes. */
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + T_PANTRY + " (id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -50,6 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         seedRecipes(db);
     }
 
+    /** Runs when DB_VERSION goes up: drops every table and rebuilds it (this also clears the pantry). */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + T_ING);
@@ -60,12 +65,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // ------------------------------------------------------------------ PANTRY CRUD
 
-    /** CREATE */
+    /** CREATE: adds a new ingredient row and returns its new id. */
     public long insertPantryItem(PantryItem item) {
         return getWritableDatabase().insert(T_PANTRY, null, toValues(item));
     }
 
-    /** READ (all) */
+    /** READ: returns every pantry item, sorted by name, ready for the RecyclerView. */
     public List<PantryItem> getAllPantryItems() {
         List<PantryItem> list = new ArrayList<>();
         try (Cursor c = getReadableDatabase().query(T_PANTRY, null, null, null,
@@ -75,7 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    /** READ (one) */
+    /** READ: returns the single pantry item with this id, or null if it does not exist. */
     public PantryItem getPantryItem(long id) {
         try (Cursor c = getReadableDatabase().query(T_PANTRY, null, "id = ?",
                 new String[]{String.valueOf(id)}, null, null, null)) {
@@ -83,21 +88,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /** UPDATE */
+    /** UPDATE: overwrites the row that has the same id as the item. */
     public int updatePantryItem(PantryItem item) {
         return getWritableDatabase().update(T_PANTRY, toValues(item), "id = ?",
                 new String[]{String.valueOf(item.getId())});
     }
 
-    /** DELETE */
+    /** DELETE: removes the row with this id from the pantry. */
     public int deletePantryItem(long id) {
         return getWritableDatabase().delete(T_PANTRY, "id = ?", new String[]{String.valueOf(id)});
     }
 
+    /** Removes every pantry item (used by "Clear pantry" in Settings). Recipes are not affected. */
     public void deleteAllPantryItems() {
         getWritableDatabase().delete(T_PANTRY, null, null);
     }
 
+    /** Packs a PantryItem into a ContentValues bag (column name and value pairs) for insert/update. */
     private ContentValues toValues(PantryItem item) {
         ContentValues cv = new ContentValues();
         cv.put("name", item.getName());
@@ -107,6 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cv;
     }
 
+    /** Turns the row the cursor is currently on back into a PantryItem object. */
     private PantryItem fromCursor(Cursor c) {
         return new PantryItem(
                 c.getLong(c.getColumnIndexOrThrow("id")),
@@ -118,7 +126,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // ------------------------------------------------------------------ RECIPES
 
-    /** All recipes, each with its ingredient list loaded. */
+    /** Loads every recipe together with its ingredient list, used by the strict matcher. */
     public List<Recipe> getAllRecipes() {
         List<Recipe> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -128,6 +136,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    /** Loads one recipe, with its ingredients, for the Recipe Detail screen (null if not found). */
     public Recipe getRecipe(long id) {
         SQLiteDatabase db = getReadableDatabase();
         try (Cursor c = db.query(T_RECIPES, null, "id = ?",
@@ -136,6 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** Builds a Recipe from the current row, then fetches its ingredient rows using the recipe_id link. */
     private Recipe recipeFromCursor(SQLiteDatabase db, Cursor c) {
         Recipe r = new Recipe(
                 c.getLong(c.getColumnIndexOrThrow("id")),
@@ -158,7 +168,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // ------------------------------------------------------------------ SEED DATA
 
-    /** Each ingredient string is "name|quantity|unit". */
+    /**
+     * Inserts one recipe, then one row per ingredient linked by recipe_id.
+     * Each ingredient string is "name|quantity|unit".
+     */
     private void addRecipe(SQLiteDatabase db, String name, String steps, String... ingredients) {
         ContentValues rv = new ContentValues();
         rv.put("name", name);
@@ -175,6 +188,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** Pre-loads the 18 recipes the first time the database is created. */
     private void seedRecipes(SQLiteDatabase db) {
         addRecipe(db, "Scrambled Eggs on Toast",
                 "1. Toast the bread.\n2. Beat the eggs with the salt.\n3. Melt the butter in a pan on low heat.\n4. Stir the eggs gently until just set.\n5. Pile onto the toast and serve.",
@@ -232,3 +246,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "bread|4|piece", "egg|2|piece", "milk|100|ml", "butter|10|g", "sugar|1|tbsp");
     }
 }
+
