@@ -24,7 +24,6 @@ public final class RecipeMatcher {
      * Totals the pantry per ingredient. Names are normalised (tomatoes = tomato)
      * and quantities converted to base units, so duplicates are added together.
      */
-    buildStock
     public static List<Recipe> getSuggested(List<Recipe> recipes, List<PantryItem> pantry) {
         Map<String, Double> stock = buildStock(pantry);
         List<Recipe> result = new ArrayList<>();

@@ -1,6 +1,5 @@
 
-Databasehelper · JAVA
-        package com.mokwena.smartpantrymanager.db;
+package com.mokwena.smartpantrymanager.db;
 
 import android.content.ContentValues;
 import android.content.Context;
