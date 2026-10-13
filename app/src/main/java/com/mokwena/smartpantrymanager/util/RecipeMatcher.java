@@ -19,6 +19,12 @@ public final class RecipeMatcher {
     private RecipeMatcher() { }
 
     /** Returns only the recipes that can be cooked right now. */
+    /** Returns only the recipes that pass the strict check in canMake. */
+    /**
+     * Totals the pantry per ingredient. Names are normalised (tomatoes = tomato)
+     * and quantities converted to base units, so duplicates are added together.
+     */
+    buildStock
     public static List<Recipe> getSuggested(List<Recipe> recipes, List<PantryItem> pantry) {
         Map<String, Double> stock = buildStock(pantry);
         List<Recipe> result = new ArrayList<>();
@@ -40,6 +46,16 @@ public final class RecipeMatcher {
         return stock;
     }
 
+
+    /**
+     * Decides whether one recipe can be cooked with the current pantry.
+     * Returns true only if EVERY ingredient is in the pantry in at least the
+     * required quantity, and false as soon as one is missing or too small.
+     * One missing ingredient rejects the whole recipe, because the app only
+     * suggests meals the user can make right now without shopping.
+     * Quantities are converted to base units (g, ml, piece) first, so that
+     * 1 kg of rice correctly satisfies a recipe that needs 200 g.
+     */
     static boolean canMake(Recipe recipe, Map<String, Double> stock) {
         if (recipe.getIngredients().isEmpty()) return false;
         for (RecipeIngredient need : recipe.getIngredients()) {
