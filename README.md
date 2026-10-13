@@ -29,5 +29,9 @@ SharedPreferences, Material Components.
 3. Connect a phone with USB debugging, or create an emulator (API 34 works well).
 4. Press Run.
 
+## Testing
+The strict-matching rule is covered by 7 JUnit unit tests (RecipeMatcherTest). They
+check that a recipe is only suggested when every ingredient is present in enough
+quantity, and that plurals, unit differences and synonyms still match.
 ## Author
 Kamogelo Bokamoso, 402311533, Richfield, Mobile App Development 700
