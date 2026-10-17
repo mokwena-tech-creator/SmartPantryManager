@@ -29,6 +29,8 @@ SharedPreferences, Material Components.
 3. Connect a phone with USB debugging, or create an emulator (API 34 works well).
 4. Press Run.
 
+## Design
+Screen flow and database diagrams: [docs/SmartPantry_Diagrams.pdf](docs/SmartPantry_Diagrams.pdf)
 ## Testing
 The strict-matching rule is covered by 7 JUnit unit tests (RecipeMatcherTest). They
 check that a recipe is only suggested when every ingredient is present in enough
